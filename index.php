@@ -7,6 +7,15 @@ $dbname = "phprest";
 
 // Create a database connection
 $conn = new mysqli($servername, $username, $password, $dbname);
+// Set the content type to JSON for all responses
+header('Content-Type: application/json');
+
+// Function to send a JSON response
+function sendResponse($code, $data) {
+    http_response_code($code);
+    echo json_encode($data);
+    exit;
+}
 
 // Check connection
 if ($conn->connect_error) {
@@ -23,17 +32,14 @@ switch ($method) {
 
         // Validate input data (e.g., name is required and is a string)
         if (empty($data["name"]) || !is_string($data["name"])) {
-            http_response_code(400);
-            echo json_encode(["message" => "Invalid input data"]);
+            sendResponse(400,["message" => "Invalid input data"] );
         } else {
             $name = mysqli_real_escape_string($conn, $data["name"]);
             $sql = "INSERT INTO persons (name) VALUES ('$name')";
             if (mysqli_query($conn, $sql)) {
-                http_response_code(201); // 201 Created
-                echo json_encode(["message" => "Person created successfully"]);
+            sendResponse(201,["message" => "Person created successfully"] );
             } else {
-                http_response_code(500); // 500 Internal Server Error
-                echo json_encode(["message" => "Failed to create person"]);
+            sendResponse(500,["message" => "Failed to create person"]);
             }
         }
         break;
@@ -44,9 +50,7 @@ switch ($method) {
     
             // Perform validation: Ensure $name is a string
             if (!is_string($user_id)) {
-                http_response_code(400);
-                echo json_encode(["message" => "Name must be a string"]);
-                exit;
+                sendResponse(400, ["message" => "Name must be a string"]);
             }
     
             // Prepare and execute the SQL query to retrieve a person by name
@@ -59,14 +63,11 @@ switch ($method) {
             if ($result->num_rows > 0) {
                 // Fetch the person's data
                 $person = $result->fetch_assoc();
-    
-                // Return the person's data as JSON
-                header('Content-Type: application/json');
+
                 echo json_encode($person);
             } else {
                 // Person not found
-                http_response_code(404);
-                echo json_encode(["message" => "Person not found"]);
+                sendResponse(404, ["message" => "Person not found"]);
             }
         } else {
             // Fetch all data when no parameters are provided
@@ -77,13 +78,12 @@ switch ($method) {
                 // Fetch all persons' data
                 $persons = $result->fetch_all(MYSQLI_ASSOC);
     
-                // Return all data as JSON
-                header('Content-Type: application/json');
+               
                 echo json_encode($persons);
             } else {
                 // No persons found
-                http_response_code(404);
-                echo json_encode(["message" => "No persons found"]);
+                sendResponse(404, ["message" => "No Persons found"]);
+
             }
         }
         break;
@@ -96,8 +96,7 @@ switch ($method) {
 
         // Validate input data (e.g., user_id is required and is an integer, name is required and is a string)
         if (!is_string($user_id) || empty($data["name"]) || !is_string($data["name"])) {
-            http_response_code(400);
-            echo json_encode(["message" => "Invalid input data"]);
+            sendResponse(400, ["message" => "Invalid input data"]);
         } else {
             $user_id = intval($user_id);
             // Prepare and execute the SQL query to update the person's name
@@ -106,11 +105,9 @@ switch ($method) {
             $stmt->bind_param("si",$name, $user_id);
 
             if ($stmt->execute()) {
-                http_response_code(200); // 200 OK
-                echo json_encode(["message" => "Person updated successfully"]);
-            } else {
-                http_response_code(500); // 500 Internal Server Error
-                echo json_encode(["message" => "Failed to update person"]);
+            sendResponse(200, ["message" => "Person updated successfully"]);
+        } else {
+                sendResponse(500, ["message" => "Failed to update person"]);
             }
         }
         break;
@@ -121,8 +118,7 @@ switch ($method) {
 
         // Validate input data (e.g., user_id is required and is an integer)
         if (!is_string($user_id)) {
-            http_response_code(400);
-            echo json_encode(["message" => "Invalid input data"]);
+            sendResponse(400, ["message" => "Invalid input data"]);
         } else {
             $user_id = intval($user_id);
             $sql = "DELETE FROM persons WHERE id = ?";
@@ -130,18 +126,15 @@ switch ($method) {
             $stmt->bind_param("i", $user_id);
     
             if ($stmt->execute()) {
-                http_response_code(204); // 204 No Content
-                echo json_encode(["message" => "Successfully deleted "]);
+            sendResponse(204, ["message" => "Successfully deleted "]);
             } else {
-                http_response_code(500); // 500 Internal Server Error
-                echo json_encode(["message" => "Failed to delete person"]);
+            sendResponse(500, ["message" => "Failed to delete person"]);
             }
         }
         break;
 
     default:
-        http_response_code(405); // 405 Method Not Allowed
-        echo json_encode(["message" => "Method not allowed"]);
+        sendResponse(405, ["message" => "Method not allowed"]);
         break;
 }
 

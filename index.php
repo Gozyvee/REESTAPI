@@ -1,11 +1,11 @@
 <?php
-// Define your database connection details
+// Defining database connection detail
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "phprest";
 
-// Create a database connection
+// Creating database connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 // Set the content type to JSON for all responses
 header('Content-Type: application/json');
@@ -30,7 +30,7 @@ switch ($method) {
         // CREATE: Adding a new person
         $data = json_decode(file_get_contents("php://input"), true);
 
-        // Validate input data (e.g., name is required and is a string)
+        // Validate input data 
         if (empty($data["name"]) || !is_string($data["name"])) {
             sendResponse(400,["message" => "Invalid input data"] );
         } else {
@@ -48,12 +48,12 @@ switch ($method) {
         if (isset($_GET["user_id"])) {
             $user_id = $_GET["user_id"];
     
-            // Perform validation: Ensure $name is a string
+            // Validate input data 
             if (!is_string($user_id)) {
                 sendResponse(400, ["message" => "Name must be a string"]);
             }
     
-            // Prepare and execute the SQL query to retrieve a person by name
+            // Retrieve a person by id
             $sql = "SELECT * FROM persons WHERE id = ?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("s", $user_id);
@@ -63,10 +63,8 @@ switch ($method) {
             if ($result->num_rows > 0) {
                 // Fetch the person's data
                 $person = $result->fetch_assoc();
-
                 echo json_encode($person);
             } else {
-                // Person not found
                 sendResponse(404, ["message" => "Person not found"]);
             }
         } else {
@@ -79,9 +77,7 @@ switch ($method) {
                 $persons = $result->fetch_all(MYSQLI_ASSOC);
                 echo json_encode($persons);
             } else {
-                // No persons found
                 sendResponse(404, ["message" => "No Persons found"]);
-
             }
         }
         break;
@@ -92,7 +88,7 @@ switch ($method) {
         $data = json_decode(file_get_contents("php://input"), true);
         $name = $data["name"];
 
-        // Validate input data (e.g., user_id is required and is an integer, name is required and is a string)
+        // Validate input data
         if (!is_string($user_id) || empty($data["name"]) || !is_string($data["name"])) {
             sendResponse(400, ["message" => "Invalid input data"]);
         } else {
@@ -114,7 +110,7 @@ switch ($method) {
         // DELETE: Removing a person
         $user_id = $_GET["user_id"];
 
-        // Validate input data (e.g., user_id is required and is an integer)
+        // Validate input data
         if (!is_string($user_id)) {
             sendResponse(400, ["message" => "Invalid input data"]);
         } else {

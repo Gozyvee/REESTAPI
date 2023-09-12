@@ -24,10 +24,10 @@ This documentation outlines the usage of the PHP REST API for managing persons i
       "message": "Person created successfully"
     }
     ```
-  - Error (HTTP 400 Bad Request):
+  - Error (HTTP 500 Internal server error):
     ```json
     {
-      "message": "Invalid input data"
+      "message": "Failed to creeate person"
     }
     ```
 
@@ -102,10 +102,10 @@ This documentation outlines the usage of the PHP REST API for managing persons i
       "message": "Person updated successfully"
     }
     ```
-  - Error (HTTP 400 Bad Request or HTTP 404 Not Found):
+  - Error (HTTP 500 Internal server error):
     ```json
     {
-      "message": "Invalid input data" or "Person not found"
+      "message": "Failed to update person" 
     }
     ```
 
@@ -122,10 +122,10 @@ This documentation outlines the usage of the PHP REST API for managing persons i
       "message": "Successfully deleted"
     }
     ```
-  - Error (HTTP 400 Bad Request or HTTP 404 Not Found):
+  - Error (HTTP 500 Internal server error):
     ```json
     {
-      "message": "Invalid input data" or "Person not found"
+      "message": "Failed to delete person"
     }
     ```
 ### 2. Sample Usage of the API

@@ -77,8 +77,6 @@ switch ($method) {
             if ($result->num_rows > 0) {
                 // Fetch all persons' data
                 $persons = $result->fetch_all(MYSQLI_ASSOC);
-    
-               
                 echo json_encode($persons);
             } else {
                 // No persons found

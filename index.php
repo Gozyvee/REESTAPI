@@ -4,9 +4,11 @@ $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "phprest";
+$port = 3306;
 
 // Creating database connection
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = new mysqli($servername, $username, $password, $dbname, $port);
+
 // Set the content type to JSON for all responses
 header('Content-Type: application/json');
 
@@ -108,22 +110,26 @@ switch ($method) {
 
     case "DELETE":
         // DELETE: Removing a person
-        $user_id = $_GET["user_id"];
-
-        // Validate input data
-        if (!is_string($user_id)) {
-            sendResponse(400, ["message" => "Invalid input data"]);
-        } else {
-            $user_id = intval($user_id);
-            $sql = "DELETE FROM persons WHERE id = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("i", $user_id);
+        $data = json_decode(file_get_contents("php://input"), true);
     
-            if ($stmt->execute()) {
+    if (isset($data["id"])) {
+        $personId = $data["id"];
+        // Perform validation
+        if (!is_string($personId)) {
+            sendResponse(400, ["message" => "Name must be a string"]);
+        }
+        // Prepare and execute the SQL query to delete the person by ID
+        $sql = "DELETE FROM persons WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $personId);
+
+        if ($stmt->execute()) {
             sendResponse(204, ["message" => "Successfully deleted "]);
-            } else {
+        } else {
             sendResponse(500, ["message" => "Failed to delete person"]);
-            }
+        }
+    } else {
+        sendResponse(400, ["message" => "ID parameter is required"]);
         }
         break;
 
@@ -134,4 +140,3 @@ switch ($method) {
 
 // Close the database connection
 mysqli_close($conn);
-?>
